@@ -36,11 +36,11 @@ public class WuwuApplication {
         registerSocketToSelector(selector);
 
         //处理socket消息
-        seletorIng(selector);
+        handleMessage(selector);
 
     }
 
-    private void seletorIng(Selector selector) throws IOException {
+    private void handleMessage(Selector selector) throws IOException {
 
         while (true) {
 
@@ -57,6 +57,7 @@ public class WuwuApplication {
                         SocketChannel client = (SocketChannel) key.channel();
                         WuwuFutureClient wuwuFutureClient = new WuwuFutureClient();
                         wuwuFutureClient.setSocketChannel(client);
+                        wuwuFutureClient.setSelector(selector);
                         clients.add(wuwuFutureClient);
                         key.attach(wuwuFutureClient);
                     }
@@ -103,10 +104,14 @@ public class WuwuApplication {
      * <p>
      * 理论上来说，应该是给多个空闲的连接中一个
      * 如果连接不够了就等待有空闲的连接
+     *
+     * 目前没有对该单个client做并发的控制 -- 比如这个引用在多个地方，send 和 read
+     * @return 返回可用的客户端连接
+     * @throws InterruptedException
      */
-    public WuwuFutureClient getClient() {
-
-        return null;
+    public WuwuFutureClient getClient() throws InterruptedException {
+        WuwuFutureClient client = clients.take();
+        return client;
     }
 
 

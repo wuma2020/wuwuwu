@@ -1,6 +1,7 @@
 package com.wuwu.base.client.first;
 
 
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -23,6 +24,11 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
      */
     private SocketChannel socketChannel;
 
+    /**
+     * 这个 selector 还是需要使用的
+     */
+    private Selector selector;
+
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -41,6 +47,11 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     @Override
     public WuwuResponse get() throws InterruptedException, ExecutionException {
+
+        //需要先判断该socket是否是可读状态的，如果是，才读
+        //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
+        //完成后，需要将socket设置成可写状态，该socket就可以复用了
+
         return null;
     }
 
@@ -57,9 +68,13 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
      * @throws Exception  可能会报错一些异常
      */
     public Boolean sendCommon(String common) {
+        //先判断这个socket是否是可写状态的，是可写的才进行写数据
 
+        //在这里直接发送命令，然后注册这个socket到读事件中
         return false;
     }
+
+
 
 
     public SocketChannel getSocketChannel() {
@@ -68,5 +83,13 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     public void setSocketChannel(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
+    }
+
+    public Selector getSelector() {
+        return selector;
+    }
+
+    public void setSelector(Selector selector) {
+        this.selector = selector;
     }
 }
