@@ -58,6 +58,7 @@ public class WuwuApplication {
                         WuwuFutureClient wuwuFutureClient = new WuwuFutureClient();
                         wuwuFutureClient.setSocketChannel(client);
                         wuwuFutureClient.setSelector(selector);
+                        wuwuFutureClient.setKey(key);
                         clients.add(wuwuFutureClient);
                         key.attach(wuwuFutureClient);
                     }
@@ -65,16 +66,7 @@ public class WuwuApplication {
                     if (key.isReadable()) {
                         WuwuFutureClient futureClient = (WuwuFutureClient) key.attachment();
                         //deal RESP协议
-
-
-                        //如果完成了读操作，需要重置这个client中的一些状态信息
-
-                    }
-
-                    if (key.isWritable()) {
-
-                        WuwuFutureClient futureClient = (WuwuFutureClient) key.attachment();
-                        //deal write RESP协议内容即可
+                        ProtocolUtil.decode(futureClient);
 
                     }
 
@@ -104,8 +96,9 @@ public class WuwuApplication {
      * <p>
      * 理论上来说，应该是给多个空闲的连接中一个
      * 如果连接不够了就等待有空闲的连接
-     *
+     * <p>
      * 目前没有对该单个client做并发的控制 -- 比如这个引用在多个地方，send 和 read
+     *
      * @return 返回可用的客户端连接
      * @throws InterruptedException
      */

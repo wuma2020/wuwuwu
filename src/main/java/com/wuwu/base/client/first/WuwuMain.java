@@ -19,7 +19,7 @@ public class WuwuMain {
         WuwuFutureClient client = wuwuApplication.getClient();
 
         //2.发送命令
-        client.sendCommon(null);
+        client.sendCommon("keys *");
 
         //3.获取结果命令，这里会阻塞，需要整个响应数据封装完成，才能返回结果
         //  理论上，实际 可以使用 isDone 方法来判断，是否完成解析，这样主线程可以用来执行其他命令（不阻塞用户主线程），
