@@ -126,4 +126,12 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
     public void setKey(SelectionKey key) {
         this.key = key;
     }
+
+    public WuwuResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(WuwuResponse response) {
+        this.response = response;
+    }
 }
