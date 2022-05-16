@@ -62,16 +62,18 @@ public class ProtocolUtil {
         //  如果解析未完成，则需要记录未完成，并记录上一次的解析位置，一直已经完成的解析内容，下一次再进来的时候，先判断是否完成解析，
         //  如果没有，从上次未解析的地方解析
         //  我每次只读取1024字节
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
 
+        ByteBuffer buffer = futureClient.getBuffer();
+        //每次读取1024个字节，
+        ByteBuffer newBuffer = MemoryCalculator.calculator(buffer);
+        futureClient.setBuffer(newBuffer);
         int read = socketChannel.read(buffer);
-        if (read >= 0) {
-            decode0(buffer, futureClient);
 
+        if (read >= 0) {
+            decode0(newBuffer, futureClient);
         } else {
             //说明读取到了结束符
-
-
+            futureClient.getResponse().setResult("连接已经关闭!");
         }
 
 
@@ -84,13 +86,9 @@ public class ProtocolUtil {
      * @param wuwuFutureClient
      */
     private static void decode0(ByteBuffer buffer, WuwuFutureClient wuwuFutureClient) {
-
+        System.out.println(buffer);
+        //转换成读取模式
         buffer.flip();
-
-        int position = buffer.position();
-        byte[] bytes = new byte[position - 1];
-        buffer.get(bytes);
-
 
     }
 
