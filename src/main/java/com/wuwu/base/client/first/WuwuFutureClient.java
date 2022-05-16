@@ -1,11 +1,14 @@
 package com.wuwu.base.client.first;
 
 
+import com.sun.org.apache.bcel.internal.generic.RET;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +23,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
     /**
      * 获取的该FutureClient对应的socket对应的读取的信息
      */
-    private WuwuResponse response;
+    private WuwuResponse response = new WuwuResponse();
 
     /**
      * 一个客户端对应的连接
@@ -36,6 +39,27 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
      * 当前socket对应的selectionKey
      */
     private SelectionKey key;
+
+    /**
+     * 缓存当前socket对应的缓存数据
+     * 初次申请512 个Byte
+     */
+    private ByteBuffer buffer = ByteBuffer.allocate(512);
+
+    /**
+     * 标识当前协议包是否解析完成
+     */
+    private volatile boolean isFinish = false;
+
+    /**
+     * 是否完成读取
+     */
+    private volatile boolean isReaded = false;
+
+    /**
+     * 是否完成写入
+     */
+    private volatile boolean isWrited = false;
 
 
     @Override
@@ -60,9 +84,22 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
         //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
         //完成后，需要将socket设置成可写状态，该socket就可以复用了
 
-        //读数据应该是在select监听的读事件里面进行，
+        //读数据应该是在select监听的读事件里面进行
 
-        return null;
+        if (isFinish) {
+            isReaded = true;
+            return this.getResponse();
+        } else {
+            while (true) {
+                //暂时先这样
+                Thread.sleep(1000);
+                WuwuResponse wuwuResponse = get();
+                if (wuwuResponse != null) {
+                    return wuwuResponse;
+                }
+            }
+        }
+
     }
 
     @Override
@@ -93,7 +130,8 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
             }
 
             socketChannel.write(encode);
-            socketChannel.register(selector, SelectionKey.OP_READ);
+            //这里需要把对应的attach对象附件上去
+            socketChannel.register(selector, SelectionKey.OP_READ, this);
 
             return true;
         } else {
@@ -133,5 +171,13 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     public void setResponse(WuwuResponse response) {
         this.response = response;
+    }
+
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
+
+    public void setBuffer(ByteBuffer buffer) {
+        this.buffer = buffer;
     }
 }

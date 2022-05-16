@@ -11,6 +11,8 @@ public class WuwuMain {
 
         WuwuApplication wuwuApplication = new WuwuApplication();
         WuwuConfig wuwuConfig = new WuwuConfig();
+        wuwuConfig.setHost("localhost");
+        wuwuConfig.setPort(6379);
         //0. 配置一些配置信息，并启动client
         wuwuApplication.startApplication(wuwuConfig);
 
@@ -30,6 +32,8 @@ public class WuwuMain {
         //4.显示结果
         String result = response.getResult();
         System.out.println(result);
+
+        Thread.sleep(1000 * 1000);
 
     }
 }

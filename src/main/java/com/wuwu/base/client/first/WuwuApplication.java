@@ -6,8 +6,9 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * redis 客户端的应用
@@ -17,12 +18,16 @@ public class WuwuApplication {
 
     private WuwuConfig config;
 
+
+    private ExecutorService workPool = Executors.newFixedThreadPool(1);
+
     private LinkedBlockingQueue<WuwuFutureClient> clients = new LinkedBlockingQueue<>();
 
     /**
      * 启动应用
      */
     public void startApplication(WuwuConfig config) throws Exception {
+
         this.config = config;
         //这里启动整个应用
         start();
@@ -30,18 +35,26 @@ public class WuwuApplication {
 
     private void start() throws IOException {
 
-        Selector selector = Selector.open();
+        CompletableFuture.runAsync(() -> {
+            try {
+                Selector selector = Selector.open();
+                //注册socket
+                registerSocketToSelector(selector);
+                //处理socket消息
+                handleMessage(selector);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("出现异常:" + e.getMessage());
+            }
+        }, workPool);
 
-        //注册socket
-        registerSocketToSelector(selector);
-
-        //处理socket消息
-        handleMessage(selector);
 
     }
 
-    private void handleMessage(Selector selector) throws IOException {
+    private void handleMessage(Selector selector) throws IOException, InterruptedException {
 
+        int time = 0;
+        LocalDateTime now = LocalDateTime.now();
         while (true) {
 
             int readyNum = selector.select();
@@ -59,8 +72,10 @@ public class WuwuApplication {
                         wuwuFutureClient.setSocketChannel(client);
                         wuwuFutureClient.setSelector(selector);
                         wuwuFutureClient.setKey(key);
-                        clients.add(wuwuFutureClient);
                         key.attach(wuwuFutureClient);
+                        //连接完成，注册写事件
+                        client.register(selector, SelectionKey.OP_WRITE);
+                        clients.add(wuwuFutureClient);
                     }
 
                     if (key.isReadable()) {
@@ -75,6 +90,18 @@ public class WuwuApplication {
 
                 }
 
+            }
+
+            time++;
+            if (time == 100) {
+                LocalDateTime now1 = LocalDateTime.now();
+                if (now.plusSeconds(3L).isAfter(now1)) {
+                    //出现是类似死循环,记录日志
+                    System.out.println("循环---");
+                    Thread.sleep(1000);
+                    time = 0;
+                }
+                time = 0;
             }
         }
     }
