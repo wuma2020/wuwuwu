@@ -13,6 +13,22 @@ public class WuwuMain {
         WuwuConfig wuwuConfig = new WuwuConfig();
         wuwuConfig.setHost("localhost");
         wuwuConfig.setPort(6379);
+
+        WuwuPipeline wuwuPipeline = new WuwuPipeline();
+        wuwuPipeline.addHandler(new MessageHandler() {
+            @Override
+            public void handle(WuwuResponse response) {
+                System.out.println("处理器处理:" + response);
+            }
+
+            @Override
+            public boolean match() {
+
+                return false;
+            }
+        });
+
+        wuwuConfig.setPipeline(wuwuPipeline);
         //0. 配置一些配置信息，并启动client
         wuwuApplication.startApplication(wuwuConfig);
 
@@ -30,8 +46,9 @@ public class WuwuMain {
 
 
         //4.显示结果
-        String result = response.getResult();
+        Object result = response.getResult();
         System.out.println(result);
+
 
         Thread.sleep(1000 * 1000);
 

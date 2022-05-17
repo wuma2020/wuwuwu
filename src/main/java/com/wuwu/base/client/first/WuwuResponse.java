@@ -11,7 +11,7 @@ public class WuwuResponse {
     /**
      * 这个response对应的完成的结果
      */
-    private String result;
+    private Object result;
 
 
 

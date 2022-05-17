@@ -1,6 +1,7 @@
 package com.wuwu.base.client.first;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
@@ -67,12 +68,13 @@ public class ProtocolUtil {
         //每次读取1024个字节，
         ByteBuffer newBuffer = MemoryCalculator.calculator(buffer);
         futureClient.setBuffer(newBuffer);
-        int read = socketChannel.read(buffer);
+        int read = socketChannel.read(newBuffer);
 
         if (read >= 0) {
             decode0(newBuffer, futureClient);
         } else {
             //说明读取到了结束符
+            futureClient.setFinish(true);
             futureClient.getResponse().setResult("连接已经关闭!");
         }
 
@@ -86,9 +88,19 @@ public class ProtocolUtil {
      * @param wuwuFutureClient
      */
     private static void decode0(ByteBuffer buffer, WuwuFutureClient wuwuFutureClient) {
-        System.out.println(buffer);
+
         //转换成读取模式
         buffer.flip();
+
+        byte type = buffer.get();
+        Object res = decodeByType(type, buffer, null);
+        if (res == null) {
+            //说明没有完成一整个的解析
+            return;
+        } else {
+            wuwuFutureClient.getResponse().setResult(res);
+            wuwuFutureClient.setFinish(true);
+        }
 
     }
 
@@ -123,6 +135,9 @@ public class ProtocolUtil {
                 changeReadToWrite(ds);
                 return null;
             }
+            if (notNeedClear == null || !notNeedClear) {
+                ds.clear();
+            }
             return res;
         } else if (type == '-') {
             //处理错误数据
@@ -132,7 +147,9 @@ public class ProtocolUtil {
                 changeReadToWrite(ds);
                 return null;
             }
-            ds.clear();
+            if (notNeedClear == null || !notNeedClear) {
+                ds.clear();
+            }
             return res;
         } else if (type == ':') {
             //处理整型数据
@@ -142,7 +159,9 @@ public class ProtocolUtil {
                 changeReadToWrite(ds);
                 return null;
             }
-            ds.clear();
+            if (notNeedClear == null || !notNeedClear) {
+                ds.clear();
+            }
             long l = Long.parseLong(res);
             return l;
         } else if (type == '*') {
@@ -152,7 +171,9 @@ public class ProtocolUtil {
                 changeReadToWrite(ds);
                 return null;
             }
-            ds.clear();
+            if (notNeedClear == null || !notNeedClear) {
+                ds.clear();
+            }
             return res;
         } else {
             return null;
@@ -163,12 +184,17 @@ public class ProtocolUtil {
     /**
      * 处理数组的获取
      * "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
+     * 如果*后面是 10，如，*10，那么就应该是读取对应的字符串
+     * <p>
+     * https://www.redis.com.cn/topics/protocol.html
      *
      * @param ds
      */
     private static LinkedList<Object> dealArrayLine(ByteBuffer ds) {
-        byte b = ds.get();
-        Integer count = b - '0';
+
+        Integer count = getInteger(ds);
+        if (count == null) return null;
+
         if (count == 0) {
             if (ds.limit() < 1) {
                 return null;
@@ -176,30 +202,54 @@ public class ProtocolUtil {
                 ds.getChar();
                 return new LinkedList<>();
             }
+        } else if (count == -1) {
+            System.out.println("数组类型下的-1 情况");
+            // TODO
+            return null;
         } else {
-            if (ds.limit() < 1) {
-                return null;
-            } else if (ds.limit() == 1) {
-                ds.getChar();
-                return null;
-            } else {
-                LinkedList<Object> res = new LinkedList<>();
-                ds.getChar();
-                for (int i = 0; i < count; i++) {
-                    byte type = ds.get();
-                    Object o = decodeByType(type, ds, true);
-                    if (o == null) {
-                        return null;
-                    } else {
-                        res.add(o);
-                    }
+            LinkedList<Object> res = new LinkedList<>();
+            for (int i = 0; i < count; i++) {
+                byte type = ds.get();
+                Object o = decodeByType(type, ds, true);
+                if (o == null) {
+                    return null;
+                } else {
+                    res.add(o);
                 }
+            }
+            return res;
+        }
 
-                return res;
+    }
+
+    private static Integer getInteger(ByteBuffer ds) {
+        //读取数组的个数
+        ds.mark();
+        StringBuilder countTemp = new StringBuilder();
+        boolean isCountFinish = false;
+        Integer count = 0;
+
+        while (ds.hasRemaining()) {
+            byte b = ds.get();
+            if (b == '\r' || b == '\n') {
+                if (b == '\n') {
+                    isCountFinish = true;
+                    break;
+                }
+            } else {
+                countTemp.append((char) b);
             }
         }
 
-
+        if (isCountFinish) {
+            //读取完成，继续处理
+            count = Integer.parseInt(countTemp.toString());
+        } else {
+            //没有读取完成
+            ds.reset();
+            return null;
+        }
+        return count;
     }
 
     /**
@@ -214,25 +264,27 @@ public class ProtocolUtil {
      * @return
      */
     private static String dealMultiLine(ByteBuffer ds) {
-        char number = (char) ds.get();
+
+        Integer count = getInteger(ds);
+        if (count == null) return null;
+
         //处理极端情况下的多行标识
-        if (number - '0' == 0) {
+        if (count == 0) {
             return "空字符串";
-        } else if (number == '-') {
+        } else if (count < 0) {
             return "不存在的值";
         }
 
         int limit = ds.limit();
-        if (limit < (1 + 2 + (number - '0') + 2)) {
+        if (limit < (ds.position() + count + 2)) {
             return null;
         }
 
         //读取完成，进行解析
-        char aChar = ds.getChar();
-        byte[] context = new byte[number];
+        byte[] context = new byte[count + 2];
         ds.get(context);
-        String s = String.valueOf(context);
-        return s;
+        String res = new String(context);
+        return res;
     }
 
     /**
@@ -263,11 +315,10 @@ public class ProtocolUtil {
 
         while (ds.hasRemaining()) {
             byte b = ds.get();
-            if (b != '\r' && b != '\n') {
-                sb.append((char) b);
-            } else if (b == '\n') {
+            sb.append((char) b);
+
+            if (b == '\n') {
                 isOver = true;
-                return sb.toString();
             }
         }
 

@@ -24,4 +24,10 @@ public class WuwuConfig {
      */
     private Integer port = 6379;
 
+
+    /**
+     * 处理的pipeline
+     */
+    private WuwuPipeline pipeline = new WuwuPipeline();
+
 }

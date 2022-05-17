@@ -42,9 +42,9 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     /**
      * 缓存当前socket对应的缓存数据
-     * 初次申请512 个Byte
+     * 初次申请 1024 个Byte
      */
-    private ByteBuffer buffer = ByteBuffer.allocate(512);
+    private ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     /**
      * 标识当前协议包是否解析完成
@@ -88,6 +88,9 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
         if (isFinish) {
             isReaded = true;
+            WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
+            pipeline.doHandler(this.getResponse());
+            //添加结果处理的handder
             return this.getResponse();
         } else {
             while (true) {
@@ -123,6 +126,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
         //先判断这个socket是否是可写状态的，是可写的才进行写数据
         boolean writable = key.isWritable();
         if (writable) {
+            this.setFinish(false);
             //在这里直接发送命令，然后注册这个socket到读事件中
             ByteBuffer encode = ProtocolUtil.encode(common);
             if (encode == null) {
@@ -179,5 +183,29 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
+    }
+
+    public boolean isFinish() {
+        return isFinish;
+    }
+
+    public void setFinish(boolean finish) {
+        isFinish = finish;
+    }
+
+    public boolean isReaded() {
+        return isReaded;
+    }
+
+    public void setReaded(boolean readed) {
+        isReaded = readed;
+    }
+
+    public boolean isWrited() {
+        return isWrited;
+    }
+
+    public void setWrited(boolean writed) {
+        isWrited = writed;
     }
 }

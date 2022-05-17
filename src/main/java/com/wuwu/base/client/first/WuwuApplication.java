@@ -3,6 +3,7 @@ package com.wuwu.base.client.first;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -16,7 +17,7 @@ import java.util.concurrent.*;
 public class WuwuApplication {
 
 
-    private WuwuConfig config;
+    public static WuwuConfig config;
 
 
     private ExecutorService workPool = Executors.newFixedThreadPool(1);
@@ -28,7 +29,7 @@ public class WuwuApplication {
      */
     public void startApplication(WuwuConfig config) throws Exception {
 
-        this.config = config;
+        WuwuApplication.config = config;
         //这里启动整个应用
         start();
     }
@@ -67,15 +68,7 @@ public class WuwuApplication {
 
                     //搜集连接的socket
                     if (key.isConnectable() && channel.finishConnect()) {
-                        SocketChannel client = (SocketChannel) key.channel();
-                        WuwuFutureClient wuwuFutureClient = new WuwuFutureClient();
-                        wuwuFutureClient.setSocketChannel(client);
-                        wuwuFutureClient.setSelector(selector);
-                        wuwuFutureClient.setKey(key);
-                        key.attach(wuwuFutureClient);
-                        //连接完成，注册写事件
-                        client.register(selector, SelectionKey.OP_WRITE);
-                        clients.add(wuwuFutureClient);
+                        connectedRegisterSelector(selector, key);
                     }
 
                     if (key.isReadable()) {
@@ -87,9 +80,7 @@ public class WuwuApplication {
 
                     iterator.remove();
 
-
                 }
-
             }
 
             time++;
@@ -104,6 +95,25 @@ public class WuwuApplication {
                 time = 0;
             }
         }
+    }
+
+    /**
+     * 连接完成后，注册监听
+     *
+     * @param selector
+     * @param key
+     * @throws ClosedChannelException
+     */
+    private void connectedRegisterSelector(Selector selector, SelectionKey key) throws ClosedChannelException {
+        SocketChannel client = (SocketChannel) key.channel();
+        WuwuFutureClient wuwuFutureClient = new WuwuFutureClient();
+        wuwuFutureClient.setSocketChannel(client);
+        wuwuFutureClient.setSelector(selector);
+        wuwuFutureClient.setKey(key);
+        key.attach(wuwuFutureClient);
+        //连接完成，注册写事件
+        client.register(selector, SelectionKey.OP_WRITE);
+        clients.add(wuwuFutureClient);
     }
 
     private void registerSocketToSelector(Selector selector) throws IOException {
