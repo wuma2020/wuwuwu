@@ -2,9 +2,11 @@ package com.wuwu.base.client.first;
 
 
 import com.sun.org.apache.bcel.internal.generic.RET;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -80,29 +82,47 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
     @Override
     public WuwuResponse get() throws InterruptedException, ExecutionException {
 
+        return null;
         //需要先判断该socket是否是可读状态的，如果是，才读
         //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
         //完成后，需要将socket设置成可写状态，该socket就可以复用了
 
         //读数据应该是在select监听的读事件里面进行
 
-        if (isFinish) {
-            isReaded = true;
-            WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
-            pipeline.doHandler(this.getResponse());
-            //添加结果处理的handder
-            return this.getResponse();
-        } else {
-            while (true) {
-                //暂时先这样
-                Thread.sleep(1000);
-                WuwuResponse wuwuResponse = get();
-                if (wuwuResponse != null) {
-                    return wuwuResponse;
-                }
-            }
-        }
+//        if (isFinish) {
+//            isReaded = true;
+//            WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
+//            pipeline.doHandler(this.getResponse());
+//            WuwuResponse wuwuResponse = new WuwuResponse();
+//            wuwuResponse.setResult(this.getResponse().getResult());
+//            reWrite();
+//            return wuwuResponse;
+//        } else {
+//            while (true) {
+//                //暂时先这样
+//                Thread.sleep(1000);
+//                WuwuResponse wuwuResponse = get();
+//                if (wuwuResponse != null) {
+//                    return wuwuResponse;
+//                }
+//            }
+//        }
 
+    }
+
+    /**
+     * 读取完成后，重新进行写
+     * @throws ClosedChannelException
+     */
+    private void reWrite() throws ClosedChannelException {
+        SocketChannel socketChannel = this.getSocketChannel();
+        Selector selector = this.getSelector();
+        this.getKey().interestOps(SelectionKey.OP_WRITE);
+        socketChannel.register(selector,SelectionKey.OP_WRITE,this);
+        this.setBuffer(ByteBuffer.allocate(1024));
+        this.setFinish(false);
+        this.setResponse(new WuwuResponse());
+        this.setWrited(true);
     }
 
     @Override
@@ -124,6 +144,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
         }
 
         //先判断这个socket是否是可写状态的，是可写的才进行写数据
+        // TODO 第二次发送的时候这里一直判断false，后面看一下
         boolean writable = key.isWritable();
         if (writable) {
             this.setFinish(false);
@@ -135,6 +156,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
             socketChannel.write(encode);
             //这里需要把对应的attach对象附件上去
+            this.getKey().interestOps(SelectionKey.OP_READ);
             socketChannel.register(selector, SelectionKey.OP_READ, this);
 
             return true;
@@ -144,6 +166,32 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     }
 
+    public WuwuResponse getCommonResponse() throws Exception{
+        //需要先判断该socket是否是可读状态的，如果是，才读
+        //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
+        //完成后，需要将socket设置成可写状态，该socket就可以复用了
+
+        //读数据应该是在select监听的读事件里面进行
+
+        if (isFinish) {
+            isReaded = true;
+            WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
+            pipeline.doHandler(this.getResponse());
+            WuwuResponse wuwuResponse = new WuwuResponse();
+            wuwuResponse.setResult(this.getResponse().getResult());
+            reWrite();
+            return wuwuResponse;
+        } else {
+            while (true) {
+                //暂时先这样
+                Thread.sleep(1000);
+                WuwuResponse wuwuResponse = getCommonResponse();
+                if (wuwuResponse != null) {
+                    return wuwuResponse;
+                }
+            }
+        }
+    }
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
