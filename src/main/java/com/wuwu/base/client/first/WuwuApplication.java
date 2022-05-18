@@ -112,7 +112,7 @@ public class WuwuApplication {
         wuwuFutureClient.setKey(key);
         key.attach(wuwuFutureClient);
         //连接完成，注册写事件
-        client.register(selector, SelectionKey.OP_WRITE);
+        client.register(selector, SelectionKey.OP_WRITE, wuwuFutureClient);
         clients.add(wuwuFutureClient);
     }
 

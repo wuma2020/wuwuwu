@@ -98,6 +98,8 @@ public class ProtocolUtil {
             //说明没有完成一整个的解析
             return;
         } else {
+            //在这里返程注册新的写的数据
+
             wuwuFutureClient.getResponse().setResult(res);
             wuwuFutureClient.setFinish(true);
         }

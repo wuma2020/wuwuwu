@@ -117,8 +117,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
     private void reWrite() throws ClosedChannelException {
         SocketChannel socketChannel = this.getSocketChannel();
         Selector selector = this.getSelector();
-        this.getKey().interestOps(SelectionKey.OP_WRITE);
-        socketChannel.register(selector,SelectionKey.OP_WRITE,this);
+        socketChannel.register(selector, SelectionKey.OP_WRITE, this);
         this.setBuffer(ByteBuffer.allocate(1024));
         this.setFinish(false);
         this.setResponse(new WuwuResponse());
@@ -137,7 +136,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
      * @return 返回发送命令是否成功
      * @throws Exception 可能会报错一些异常
      */
-    public Boolean sendCommon(String common) throws IOException {
+    public Boolean sendCommon(String common) throws IOException, InterruptedException {
 
         if (common == null || common.length() == 0) {
             return false;
@@ -145,7 +144,17 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
         //先判断这个socket是否是可写状态的，是可写的才进行写数据
         // TODO 第二次发送的时候这里一直判断false，后面看一下
-        boolean writable = key.isWritable();
+        boolean writable = false;
+        while (true) {
+            writable = key.isWritable();
+            if (!writable) {
+                System.out.println("写 key 一直是false");
+                Thread.sleep(1000);
+                continue;
+            }
+            break;
+        }
+
         if (writable) {
             this.setFinish(false);
             //在这里直接发送命令，然后注册这个socket到读事件中
@@ -156,9 +165,10 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
             socketChannel.write(encode);
             //这里需要把对应的attach对象附件上去
-            this.getKey().interestOps(SelectionKey.OP_READ);
             socketChannel.register(selector, SelectionKey.OP_READ, this);
-
+            this.setBuffer(ByteBuffer.allocate(1024));
+            this.setResponse(new WuwuResponse());
+            this.setFinish(false);
             return true;
         } else {
             return false;

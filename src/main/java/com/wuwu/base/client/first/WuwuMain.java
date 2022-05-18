@@ -40,7 +40,7 @@ public class WuwuMain {
         //2.发送命令
         Boolean aBoolean = client.sendCommon("keys *");
         if(!aBoolean){
-            System.out.println("keys* 发送失败");
+            System.out.println("keys * 发送失败");
         }
 
         //3.获取结果命令，这里会阻塞，需要整个响应数据封装完成，才能返回结果
