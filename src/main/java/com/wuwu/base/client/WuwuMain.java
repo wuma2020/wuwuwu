@@ -41,11 +41,7 @@ public class WuwuMain {
             System.out.println("keys * 发送失败");
         }
 
-        //3.获取结果命令，这里会阻塞，需要整个响应数据封装完成，才能返回结果
-        //  理论上，实际 可以使用 isDone 方法来判断，是否完成解析，这样主线程可以用来执行其他命令（不阻塞用户主线程），
-        //  等到必须需要的时候，才get
         WuwuResponse response = (WuwuResponse) client.getCommonResponse();
-
 
         //4.显示结果
         Object result = response.getResult();

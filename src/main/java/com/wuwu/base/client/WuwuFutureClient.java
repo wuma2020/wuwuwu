@@ -1,21 +1,16 @@
 package com.wuwu.base.client;
 
 
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * 客户端实例
  */
-public class WuwuFutureClient implements Future<WuwuResponse> {
+public class WuwuFutureClient {
 
 
     /**
@@ -60,54 +55,8 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
     private volatile boolean isWrited = false;
 
 
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public boolean isDone() {
-        return false;
-    }
-
-    @Override
-    public WuwuResponse get() throws InterruptedException, ExecutionException {
-
-        return null;
-        //需要先判断该socket是否是可读状态的，如果是，才读
-        //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
-        //完成后，需要将socket设置成可写状态，该socket就可以复用了
-
-        //读数据应该是在select监听的读事件里面进行
-
-//        if (isFinish) {
-//            isReaded = true;
-//            WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
-//            pipeline.doHandler(this.getResponse());
-//            WuwuResponse wuwuResponse = new WuwuResponse();
-//            wuwuResponse.setResult(this.getResponse().getResult());
-//            reWrite();
-//            return wuwuResponse;
-//        } else {
-//            while (true) {
-//                //暂时先这样
-//                Thread.sleep(1000);
-//                WuwuResponse wuwuResponse = get();
-//                if (wuwuResponse != null) {
-//                    return wuwuResponse;
-//                }
-//            }
-//        }
-
-    }
-
     /**
-     * 读取完成后，重新进行写
+     * 读取完成后，重置一些数据，重新进行写
      */
     private void reWrite() {
         this.setBuffer(ByteBuffer.allocate(1024));
@@ -115,12 +64,6 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
         this.setResponse(new WuwuResponse());
         this.setWrited(true);
     }
-
-    @Override
-    public WuwuResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return null;
-    }
-
 
     /**
      * 发送命令
