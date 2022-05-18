@@ -1,4 +1,4 @@
-package com.wuwu.base.client.first;
+package com.wuwu.base.client;
 
 import java.nio.channels.SocketChannel;
 

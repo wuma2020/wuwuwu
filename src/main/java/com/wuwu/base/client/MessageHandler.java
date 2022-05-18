@@ -1,4 +1,4 @@
-package com.wuwu.base.client.first;
+package com.wuwu.base.client;
 
 /**
  * 处理响应消息的类

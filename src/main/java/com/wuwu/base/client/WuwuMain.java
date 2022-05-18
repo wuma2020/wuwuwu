@@ -1,7 +1,5 @@
-package com.wuwu.base.client.first;
+package com.wuwu.base.client;
 
-
-import java.security.AlgorithmConstraints;
 
 /**
  * 主要的启动类

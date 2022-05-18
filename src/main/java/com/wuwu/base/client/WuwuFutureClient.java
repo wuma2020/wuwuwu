@@ -1,16 +1,12 @@
-package com.wuwu.base.client.first;
+package com.wuwu.base.client;
 
 
-import com.sun.org.apache.bcel.internal.generic.RET;
-import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -138,8 +134,6 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
             return false;
         }
 
-        //先判断这个socket是否是可写状态的，是可写的才进行写数据
-        // TODO 第二次发送的时候这里一直判断false，后面看一下
         boolean writable = false;
         while (true) {
             writable = key.isWritable();
@@ -172,12 +166,18 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     }
 
+    /**
+     * 需要先判断该socket是否是可读状态的，如果是，才读
+     * 这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
+     * 完成后，需要将socket设置成可写状态，该socket就可以复用了
+     * <p>
+     * 读数据应该是在select监听的读事件里面进行
+     *
+     * @return
+     * @throws Exception
+     */
     public WuwuResponse getCommonResponse() throws Exception {
-        //需要先判断该socket是否是可读状态的，如果是，才读
-        //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
-        //完成后，需要将socket设置成可写状态，该socket就可以复用了
 
-        //读数据应该是在select监听的读事件里面进行
 
         if (isFinish) {
             isReaded = true;

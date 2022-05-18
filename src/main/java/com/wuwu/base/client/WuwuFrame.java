@@ -1,4 +1,4 @@
-package com.wuwu.base.client.first;
+package com.wuwu.base.client;
 
 /**
  * 计划做的response的结果帧
