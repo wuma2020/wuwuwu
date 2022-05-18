@@ -1,8 +1,10 @@
 package com.wuwu.base.client.first;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
@@ -87,7 +89,7 @@ public class ProtocolUtil {
      * @param buffer
      * @param wuwuFutureClient
      */
-    private static void decode0(ByteBuffer buffer, WuwuFutureClient wuwuFutureClient) {
+    private static void decode0(ByteBuffer buffer, WuwuFutureClient wuwuFutureClient) throws ClosedChannelException {
 
         //转换成读取模式
         buffer.flip();
@@ -99,7 +101,9 @@ public class ProtocolUtil {
             return;
         } else {
             //在这里返程注册新的写的数据
-
+            Selector selector = wuwuFutureClient.getSelector();
+            SocketChannel client = wuwuFutureClient.getSocketChannel();
+            client.register(selector, SelectionKey.OP_WRITE,wuwuFutureClient);
             wuwuFutureClient.getResponse().setResult(res);
             wuwuFutureClient.setFinish(true);
         }

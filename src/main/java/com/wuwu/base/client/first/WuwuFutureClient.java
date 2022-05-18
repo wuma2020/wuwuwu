@@ -112,12 +112,8 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     /**
      * 读取完成后，重新进行写
-     * @throws ClosedChannelException
      */
-    private void reWrite() throws ClosedChannelException {
-        SocketChannel socketChannel = this.getSocketChannel();
-        Selector selector = this.getSelector();
-        socketChannel.register(selector, SelectionKey.OP_WRITE, this);
+    private void reWrite() {
         this.setBuffer(ByteBuffer.allocate(1024));
         this.setFinish(false);
         this.setResponse(new WuwuResponse());
@@ -176,7 +172,7 @@ public class WuwuFutureClient implements Future<WuwuResponse> {
 
     }
 
-    public WuwuResponse getCommonResponse() throws Exception{
+    public WuwuResponse getCommonResponse() throws Exception {
         //需要先判断该socket是否是可读状态的，如果是，才读
         //这里需要完成一整个响应完成，才能返回，并且 重置掉 掉这个socket之前对应的解析协议的状态()
         //完成后，需要将socket设置成可写状态，该socket就可以复用了

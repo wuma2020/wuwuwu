@@ -53,12 +53,12 @@ public class WuwuMain {
         Object result = response.getResult();
         System.out.println(result);
 
-        Boolean sendSuccess = client.sendCommon("info");
+        Boolean sendSuccess = client.sendCommon("set xiaoxiao xxxx");
         if(!sendSuccess){
             System.out.println("发送 info 不成功");
         }
         WuwuResponse wuwuResponse = client.getCommonResponse();
-        System.out.println(wuwuResponse);
+        System.out.println(wuwuResponse.getResult());
 
 
         Thread.sleep(1000 * 1000);
