@@ -32,17 +32,10 @@ public class WuwuMain {
 
         WuwuResponse response = client.getCommonResponse();
 
-//        //4.显示结果
-//        Object result = response.getResult();
-//        System.out.println(result);
-//
-//        Boolean sendSuccess = client.sendCommon("set xiaoxiao xxxx");
-//        if(!sendSuccess){
-//            System.out.println("发送 info 不成功");
-//        }
-//        WuwuResponse wuwuResponse = client.getCommonResponse();
-//        System.out.println(wuwuResponse.getResult());
-//
+        //4.显示结果
+        Object result = response.getResult();
+        System.out.println(result);
+
 //        client.recycleSocket();
 
         Thread.sleep(1000 * 1000);
