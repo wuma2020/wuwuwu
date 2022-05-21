@@ -121,7 +121,6 @@ public class WuwuFutureClient {
      */
     public WuwuResponse getCommonResponse() throws Exception {
 
-
         if (isFinish) {
             isReaded = true;
             WuwuPipeline pipeline = WuwuApplication.config.getPipeline();
@@ -132,7 +131,6 @@ public class WuwuFutureClient {
             return wuwuResponse;
         } else {
             while (true) {
-                //暂时先这样
                 Thread.sleep(1000);
                 WuwuResponse wuwuResponse = getCommonResponse();
                 if (wuwuResponse != null) {
@@ -204,5 +202,12 @@ public class WuwuFutureClient {
 
     public void setWrited(boolean writed) {
         isWrited = writed;
+    }
+
+    /**
+     * 回收这个socket channel
+     */
+    public void recycleSocket() {
+        WuwuApplication.getClients().add(this);
     }
 }

@@ -22,7 +22,7 @@ public class WuwuApplication {
 
     private ExecutorService workPool = Executors.newFixedThreadPool(1);
 
-    private LinkedBlockingQueue<WuwuFutureClient> clients = new LinkedBlockingQueue<>();
+    public static LinkedBlockingQueue<WuwuFutureClient> clients = new LinkedBlockingQueue<>();
 
     /**
      * 启动应用
@@ -141,6 +141,23 @@ public class WuwuApplication {
     public WuwuFutureClient getClient() throws InterruptedException {
         WuwuFutureClient client = clients.take();
         return client;
+    }
+
+    public static WuwuConfig getConfig() {
+        return config;
+    }
+
+    public static void setConfig(WuwuConfig config) {
+        WuwuApplication.config = config;
+    }
+
+
+    public static LinkedBlockingQueue<WuwuFutureClient> getClients() {
+        return clients;
+    }
+
+    public static void setClients(LinkedBlockingQueue<WuwuFutureClient> clientQueue) {
+        clients = clientQueue;
     }
 
 
