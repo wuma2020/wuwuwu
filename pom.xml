@@ -7,15 +7,31 @@
     <groupId>org.example</groupId>
     <artifactId>wuwuwu</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <log4j-version>2.17.2</log4j-version>
+    </properties>
+
     <dependencies>
 
-
+        <!-- 引入lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.12</version>
         </dependency>
 
+        <!--   引入log4j2     -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j-version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel;
 /**
  * 客户端实例
  */
+
 public class WuwuFutureClient {
 
 
@@ -54,6 +55,64 @@ public class WuwuFutureClient {
      */
     private volatile boolean isWrited = false;
 
+
+    // ==========================下面为一些基础方法，如发送message 和 get response==============================
+
+
+    /**
+     * 根据key获取结果
+     *
+     * @param key
+     * @return 该key对应的结果
+     */
+    public String get(String key) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("get").append(" ").append(key);
+        this.sendCommon(sb.toString());
+        return (String) this.getCommonResponse().getResult();
+    }
+
+    /**
+     * 设置值
+     *
+     * @param key
+     * @param value 如果value中有空格，这个需要处理下
+     * @return 设置响应
+     * @throws Exception
+     */
+    public String set(String key, String value) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("set").append(" ").append(key).append(" ").append(value);
+        this.sendCommon(sb.toString());
+        return (String) this.getCommonResponse().getResult();
+    }
+
+    /**
+     * keys * 命令
+     *
+     * @return
+     */
+    public Object keys() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("keys *");
+        this.sendCommon(sb.toString());
+        return (Object) this.getCommonResponse().getResult();
+    }
+
+    /**
+     * info
+     *
+     * @return
+     */
+    public Object info() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("info");
+        this.sendCommon(sb.toString());
+        return (Object) this.getCommonResponse().getResult();
+    }
+
+
+    // ==========================下面为一些基础方法，如发送message 和 get response==============================
 
     /**
      * 读取完成后，重置一些数据，重新进行写
@@ -127,6 +186,7 @@ public class WuwuFutureClient {
             pipeline.doHandler(this.getResponse());
             WuwuResponse wuwuResponse = new WuwuResponse();
             wuwuResponse.setResult(this.getResponse().getResult());
+            wuwuResponse.setType(this.getResponse().getType());
             reWrite();
             return wuwuResponse;
         } else {
@@ -139,6 +199,16 @@ public class WuwuFutureClient {
             }
         }
     }
+
+    /**
+     * 回收这个socket channel
+     */
+    public void recycleSocket() {
+        WuwuApplication.getClients().add(this);
+    }
+
+
+    // ==========================下面为一些set get 方法==============================
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -204,10 +274,4 @@ public class WuwuFutureClient {
         isWrited = writed;
     }
 
-    /**
-     * 回收这个socket channel
-     */
-    public void recycleSocket() {
-        WuwuApplication.getClients().add(this);
-    }
 }

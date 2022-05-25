@@ -19,8 +19,7 @@ public class WuwuApplication {
 
     public static WuwuConfig config;
 
-
-    private ExecutorService workPool = Executors.newFixedThreadPool(1);
+    private ExecutorService workPool = Executors.newFixedThreadPool(2);
 
     public static LinkedBlockingQueue<WuwuFutureClient> clients = new LinkedBlockingQueue<>();
 
@@ -87,7 +86,7 @@ public class WuwuApplication {
                 LocalDateTime now1 = LocalDateTime.now();
                 if (now.plusSeconds(3L).isAfter(now1)) {
                     //出现是类似死循环,记录日志
-                    System.out.println("循环---");
+//                    System.out.println("循环---");
                     Thread.sleep(1000);
                     time = 0;
                 }

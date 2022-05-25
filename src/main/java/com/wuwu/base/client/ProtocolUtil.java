@@ -70,6 +70,7 @@ public class ProtocolUtil {
             //说明读取到了结束符
             futureClient.setFinish(true);
             futureClient.getResponse().setResult("连接已经关闭!");
+            futureClient.getResponse().setType(WuwuResponse.CLOSE);
         }
 
 
@@ -95,11 +96,35 @@ public class ProtocolUtil {
             //在这里返程注册新的写的数据
             Selector selector = wuwuFutureClient.getSelector();
             SocketChannel client = wuwuFutureClient.getSocketChannel();
-            client.register(selector, SelectionKey.OP_WRITE,wuwuFutureClient);
+            client.register(selector, SelectionKey.OP_WRITE, wuwuFutureClient);
             wuwuFutureClient.getResponse().setResult(res);
+            wuwuFutureClient.getResponse().setType(getResponseTypeByByte(type));
             wuwuFutureClient.setFinish(true);
         }
 
+    }
+
+    /**
+     * 根据响应的类型，设置响应的相应类型
+     *
+     * @param type
+     * @return
+     */
+    private static Integer getResponseTypeByByte(byte type) {
+        switch (type) {
+            case '+':
+                return WuwuResponse.LINE;
+            case '-':
+                return WuwuResponse.ERROR;
+            case ':':
+                return WuwuResponse.NUMBER;
+            case '$':
+                return WuwuResponse.MULTI_LINE;
+            case '*':
+                return WuwuResponse.ARRAY;
+            default:
+                return WuwuResponse.CLOSE;
+        }
     }
 
 
@@ -194,16 +219,11 @@ public class ProtocolUtil {
         if (count == null) return null;
 
         if (count == 0) {
-            if (ds.limit() < 1) {
-                return null;
-            } else {
-                ds.getChar();
-                return new LinkedList<>();
-            }
+            System.out.println("空数组");
+            return new LinkedList<>();
         } else if (count == -1) {
-            System.out.println("数组类型下的-1 情况");
-            // TODO
-            return null;
+            System.out.println("命令超时");
+            return new LinkedList<>();
         } else {
             LinkedList<Object> res = new LinkedList<>();
             for (int i = 0; i < count; i++) {
