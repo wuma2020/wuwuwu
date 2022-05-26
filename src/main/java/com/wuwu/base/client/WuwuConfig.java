@@ -24,6 +24,11 @@ public class WuwuConfig {
      */
     private Integer port = 6379;
 
+    /**
+     * redis 密码
+     */
+    private String password = "";
+
 
     /**
      * 处理的pipeline

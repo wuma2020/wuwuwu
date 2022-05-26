@@ -1,6 +1,8 @@
 package com.wuwu.base.client;
 
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -57,6 +59,24 @@ public class WuwuFutureClient {
 
 
     // ==========================下面为一些基础方法，如发送message 和 get response==============================
+
+    /**
+     * 认证方法
+     *
+     * @return
+     */
+    public String auth() throws Exception {
+
+        String password = WuwuApplication.config.getPassword();
+        if (password == null || Strings.isBlank(password)) {
+            return "未配置redis密码";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("auth").append(" ").append(password);
+        this.sendCommon(sb.toString());
+        return (String) this.getCommonResponse().getResult();
+    }
 
 
     /**
@@ -191,6 +211,7 @@ public class WuwuFutureClient {
             return wuwuResponse;
         } else {
             while (true) {
+                // TODO 这里可以优化一下
                 Thread.sleep(1000);
                 WuwuResponse wuwuResponse = getCommonResponse();
                 if (wuwuResponse != null) {
