@@ -1,5 +1,6 @@
 package com.wuwu.base;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.net.SocketFactory;
@@ -10,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
+@Ignore
 public class TestRedisClient {
 
     private static final String SEPARATOR = "\r\n";
@@ -53,7 +55,6 @@ public class TestRedisClient {
         }
 
 
-
 //        ByteBuffer.wrap(req.getBytes(StandardCharsets.UTF_8)).compact();
 //        client.write(ByteBuffer.wrap(req.getBytes(StandardCharsets.UTF_8),0,req.length()));
 //
@@ -93,7 +94,6 @@ public class TestRedisClient {
         client.close();
 
     }
-
 
 
 }

@@ -96,7 +96,7 @@ public class WuwuFutureClient {
      * 设置值
      *
      * @param key
-     * @param value 如果value中有空格，这个需要处理下
+     * @param value
      * @return 设置响应
      * @throws Exception
      */

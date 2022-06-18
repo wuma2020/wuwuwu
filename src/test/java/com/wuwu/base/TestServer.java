@@ -1,5 +1,6 @@
 package com.wuwu.base;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
+@Ignore
 public class TestServer {
 
     @Test
@@ -35,7 +37,6 @@ public class TestServer {
 
 
     }
-
 
 
     @Test
@@ -73,11 +74,7 @@ public class TestServer {
         System.out.println(allocate);
 
 
-
-
-
     }
-
 
 
 }

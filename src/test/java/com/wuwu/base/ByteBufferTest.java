@@ -1,10 +1,12 @@
 package com.wuwu.base;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+@Ignore
 public class ByteBufferTest {
 
     /**

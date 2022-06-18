@@ -2,8 +2,10 @@ package com.wuwu.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class TestLog {
 
     private static final Logger LOGGER = LogManager.getLogger();
