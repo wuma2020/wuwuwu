@@ -16,7 +16,7 @@ public class WuwuPipeline {
     /**
      * 添加处理的handle
      *
-     * @param handler
+     * @param handler the handler
      */
     public void addHandler(MessageHandler handler) {
         handlers.add(handler);
@@ -25,6 +25,8 @@ public class WuwuPipeline {
 
     /**
      * 执行处理器
+     *
+     * @param response the response
      */
     public void doHandler(WuwuResponse response) {
         handlers.forEach(handler -> {

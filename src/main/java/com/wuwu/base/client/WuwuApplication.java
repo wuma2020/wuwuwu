@@ -17,14 +17,24 @@ import java.util.concurrent.*;
 public class WuwuApplication {
 
 
+    /**
+     * The constant config.
+     */
     public static WuwuConfig config;
 
     private ExecutorService workPool = Executors.newFixedThreadPool(2);
 
+    /**
+     * The constant clients.
+     */
     public static LinkedBlockingQueue<WuwuFutureClient> clients = new LinkedBlockingQueue<>();
 
+
     /**
-     * 启动应用
+     * 启动方法
+     *
+     * @param config 配置
+     * @throws Exception 异常
      */
     public void startApplication(WuwuConfig config) throws Exception {
 
@@ -33,6 +43,10 @@ public class WuwuApplication {
         start();
     }
 
+    /**
+     * 启动
+     * @throws IOException io异常
+     */
     private void start() throws IOException {
 
         CompletableFuture.runAsync(() -> {
@@ -50,6 +64,7 @@ public class WuwuApplication {
 
 
     }
+
 
     private void handleMessage(Selector selector) throws IOException, InterruptedException {
 
@@ -134,27 +149,47 @@ public class WuwuApplication {
      * <p>
      * 目前没有对该单个client做并发的控制 -- 比如这个引用在多个地方，send 和 read
      *
-     * @return 返回可用的客户端连接
-     * @throws InterruptedException
+     * @return 返回可用的客户端连接 client
+     * @throws InterruptedException the interrupted exception
      */
     public WuwuFutureClient getClient() throws InterruptedException {
         WuwuFutureClient client = clients.take();
         return client;
     }
 
+    /**
+     * Gets config.
+     *
+     * @return the config
+     */
     public static WuwuConfig getConfig() {
         return config;
     }
 
+    /**
+     * Sets config.
+     *
+     * @param config the config
+     */
     public static void setConfig(WuwuConfig config) {
         WuwuApplication.config = config;
     }
 
 
+    /**
+     * Gets clients.
+     *
+     * @return the clients
+     */
     public static LinkedBlockingQueue<WuwuFutureClient> getClients() {
         return clients;
     }
 
+    /**
+     * Sets clients.
+     *
+     * @param clientQueue the client queue
+     */
     public static void setClients(LinkedBlockingQueue<WuwuFutureClient> clientQueue) {
         clients = clientQueue;
     }

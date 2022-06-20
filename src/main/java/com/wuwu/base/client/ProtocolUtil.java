@@ -22,8 +22,8 @@ public class ProtocolUtil {
     /**
      * 解析redis 发送消息
      *
-     * @param common
-     * @return
+     * @param common redis 命令
+     * @return redis发送的二进制缓存 byte buffer
      */
     public static ByteBuffer encode(String common) {
 
@@ -54,7 +54,8 @@ public class ProtocolUtil {
     /**
      * 根据resp协议来进行解码
      *
-     * @param futureClient
+     * @param futureClient 一个redis的client
+     * @throws IOException io异常
      */
     public static void decode(WuwuFutureClient futureClient) throws IOException {
 
@@ -79,8 +80,9 @@ public class ProtocolUtil {
     /**
      * 解析方法
      *
-     * @param buffer
-     * @param wuwuFutureClient
+     * @param buffer socket read 出来的buffer
+     * @param wuwuFutureClient 一个redis的client
+     * @throws  ClosedChannelException 异常
      */
     private static void decode0(ByteBuffer buffer, WuwuFutureClient wuwuFutureClient) throws ClosedChannelException {
 
@@ -107,8 +109,8 @@ public class ProtocolUtil {
     /**
      * 根据响应的类型，设置响应的相应类型
      *
-     * @param type
-     * @return
+     * @param type RESP协议的类型
+     * @return 类型的常量
      */
     private static Integer getResponseTypeByByte(byte type) {
         switch (type) {
@@ -131,6 +133,7 @@ public class ProtocolUtil {
     /**
      * 根据协议的具体类型来进行解析该协议的内容
      *
+     * @param type         the type
      * @param ds           此时的ds为读模式下
      * @param notNeedClear 是否需要清除ds
      * @return 返回实际的类型数据 如 单行字符串 错误字符串 整数类型
@@ -211,7 +214,7 @@ public class ProtocolUtil {
      * <p>
      * https://www.redis.com.cn/topics/protocol.html
      *
-     * @param ds
+     * @param ds 需要解码的buffer
      */
     private static LinkedList<Object> dealArrayLine(ByteBuffer ds) {
 
@@ -240,6 +243,11 @@ public class ProtocolUtil {
 
     }
 
+    /**
+     *
+     * @param ds 获取长度的buffer
+     * @return 某个类型下的字节长度
+     */
     private static Integer getInteger(ByteBuffer ds) {
         //读取数组的个数
         ds.mark();
@@ -278,8 +286,8 @@ public class ProtocolUtil {
      * <p>
      * limit = res + 2
      *
-     * @param ds
-     * @return
+     * @param ds 多行字符串的buffer
+     * @return 字符串
      */
     private static String dealMultiLine(ByteBuffer ds) {
 
@@ -308,7 +316,7 @@ public class ProtocolUtil {
     /**
      * 切换读取模式到写模式
      *
-     * @param ds
+     * @param ds 需要切换的buffer
      */
     private static void changeReadToWrite(ByteBuffer ds) {
         //重置

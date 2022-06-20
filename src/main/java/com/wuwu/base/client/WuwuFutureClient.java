@@ -12,7 +12,6 @@ import java.nio.channels.SocketChannel;
 /**
  * 客户端实例
  */
-
 public class WuwuFutureClient {
 
 
@@ -63,7 +62,8 @@ public class WuwuFutureClient {
     /**
      * 认证方法
      *
-     * @return
+     * @return string
+     * @throws Exception the exception
      */
     public String auth() throws Exception {
 
@@ -82,8 +82,9 @@ public class WuwuFutureClient {
     /**
      * 根据key获取结果
      *
-     * @param key
-     * @return 该key对应的结果
+     * @param key the key
+     * @return 该key对应的结果 string
+     * @throws Exception the exception
      */
     public String get(String key) throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -95,10 +96,10 @@ public class WuwuFutureClient {
     /**
      * 设置值
      *
-     * @param key
-     * @param value
-     * @return 设置响应
-     * @throws Exception
+     * @param key   the key
+     * @param value the value
+     * @return 设置响应 string
+     * @throws Exception the exception
      */
     public String set(String key, String value) throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -110,7 +111,8 @@ public class WuwuFutureClient {
     /**
      * keys * 命令
      *
-     * @return
+     * @return object
+     * @throws Exception the exception
      */
     public Object keys() throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -122,7 +124,8 @@ public class WuwuFutureClient {
     /**
      * info
      *
-     * @return
+     * @return object
+     * @throws Exception the exception
      */
     public Object info() throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -147,8 +150,10 @@ public class WuwuFutureClient {
     /**
      * 发送命令
      *
-     * @return 返回发送命令是否成功
-     * @throws Exception 可能会报错一些异常
+     * @param common the common
+     * @return 返回发送命令是否成功 boolean
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
      */
     public Boolean sendCommon(String common) throws IOException, InterruptedException {
 
@@ -195,8 +200,8 @@ public class WuwuFutureClient {
      * <p>
      * 读数据应该是在select监听的读事件里面进行
      *
-     * @return
-     * @throws Exception
+     * @return common response
+     * @throws Exception the exception
      */
     public WuwuResponse getCommonResponse() throws Exception {
 
@@ -231,66 +236,146 @@ public class WuwuFutureClient {
 
     // ==========================下面为一些set get 方法==============================
 
+    /**
+     * Gets socket channel.
+     *
+     * @return the socket channel
+     */
     public SocketChannel getSocketChannel() {
         return socketChannel;
     }
 
+    /**
+     * Sets socket channel.
+     *
+     * @param socketChannel the socket channel
+     */
     public void setSocketChannel(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
     }
 
+    /**
+     * Gets selector.
+     *
+     * @return the selector
+     */
     public Selector getSelector() {
         return selector;
     }
 
+    /**
+     * Sets selector.
+     *
+     * @param selector the selector
+     */
     public void setSelector(Selector selector) {
         this.selector = selector;
     }
 
+    /**
+     * Gets key.
+     *
+     * @return the key
+     */
     public SelectionKey getKey() {
         return key;
     }
 
+    /**
+     * Sets key.
+     *
+     * @param key the key
+     */
     public void setKey(SelectionKey key) {
         this.key = key;
     }
 
+    /**
+     * Gets response.
+     *
+     * @return the response
+     */
     public WuwuResponse getResponse() {
         return response;
     }
 
+    /**
+     * Sets response.
+     *
+     * @param response the response
+     */
     public void setResponse(WuwuResponse response) {
         this.response = response;
     }
 
+    /**
+     * Gets buffer.
+     *
+     * @return the buffer
+     */
     public ByteBuffer getBuffer() {
         return buffer;
     }
 
+    /**
+     * Sets buffer.
+     *
+     * @param buffer the buffer
+     */
     public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
+    /**
+     * Is finish boolean.
+     *
+     * @return the boolean
+     */
     public boolean isFinish() {
         return isFinish;
     }
 
+    /**
+     * Sets finish.
+     *
+     * @param finish the finish
+     */
     public void setFinish(boolean finish) {
         isFinish = finish;
     }
 
+    /**
+     * Is readed boolean.
+     *
+     * @return the boolean
+     */
     public boolean isReaded() {
         return isReaded;
     }
 
+    /**
+     * Sets readed.
+     *
+     * @param readed the readed
+     */
     public void setReaded(boolean readed) {
         isReaded = readed;
     }
 
+    /**
+     * Is writed boolean.
+     *
+     * @return the boolean
+     */
     public boolean isWrited() {
         return isWrited;
     }
 
+    /**
+     * Sets writed.
+     *
+     * @param writed the writed
+     */
     public void setWrited(boolean writed) {
         isWrited = writed;
     }

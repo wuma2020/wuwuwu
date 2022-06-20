@@ -22,8 +22,8 @@ public class MemoryCalculator {
      * 此时的buffer还是写状态
      * 翻转，然后读取到新的buffer中
      *
-     * @param oldBuffer
-     * @return
+     * @param oldBuffer 老的缓存
+     * @return  新的缓存对象
      */
     public static ByteBuffer calculator(ByteBuffer oldBuffer) {
 
@@ -49,8 +49,8 @@ public class MemoryCalculator {
     /**
      * 计算新的缓冲区
      *
-     * @param oldBuffer
-     * @return
+     * @param oldBuffer 老的缓存对象
+     * @return 新的缓存对象
      */
     public static ByteBuffer calculator_double(ByteBuffer oldBuffer) {
 
