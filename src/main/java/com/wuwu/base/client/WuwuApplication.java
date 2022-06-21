@@ -1,6 +1,9 @@
 package com.wuwu.base.client;
 
 
+import com.wuwu.base.client.cofig.CommonConfig;
+import com.wuwu.base.client.cofig.WuwuConfig;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ClosedChannelException;
@@ -15,7 +18,6 @@ import java.util.concurrent.*;
  * redis 客户端的应用
  */
 public class WuwuApplication {
-
 
     /**
      * The constant config.
@@ -99,10 +101,10 @@ public class WuwuApplication {
             time++;
             if (time == 100) {
                 LocalDateTime now1 = LocalDateTime.now();
-                if (now.plusSeconds(3L).isAfter(now1)) {
+                if (now.plusSeconds(CommonConfig.SELECTOR_CIRCULATION_SLEEP).isAfter(now1)) {
                     //出现是类似死循环,记录日志
-//                    System.out.println("循环---");
-                    Thread.sleep(1000);
+                    LogUtil.log.warn("selector在3秒内出现100次空轮训");
+                    TimeUnit.MICROSECONDS.sleep(CommonConfig.SELECT_TIME_SLEEP);
                     time = 0;
                 }
                 time = 0;

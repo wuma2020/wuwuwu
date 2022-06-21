@@ -1,13 +1,14 @@
 package com.wuwu.base.client;
 
 
+import com.wuwu.base.client.cofig.CommonConfig;
 import org.apache.logging.log4j.util.Strings;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 客户端实例
@@ -166,7 +167,7 @@ public class WuwuFutureClient {
             writable = key.isWritable();
             if (!writable) {
                 System.out.println("写 key 一直是false");
-                Thread.sleep(1000);
+                TimeUnit.MICROSECONDS.sleep(CommonConfig.TIME_SLEEP);
                 continue;
             }
             break;
@@ -216,8 +217,7 @@ public class WuwuFutureClient {
             return wuwuResponse;
         } else {
             while (true) {
-                // TODO 这里可以优化一下
-                Thread.sleep(1000);
+                TimeUnit.MICROSECONDS.sleep(CommonConfig.TIME_SLEEP);
                 WuwuResponse wuwuResponse = getCommonResponse();
                 if (wuwuResponse != null) {
                     return wuwuResponse;

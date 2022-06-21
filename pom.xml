@@ -6,7 +6,7 @@
 
     <groupId>io.github.wuma2020</groupId>
     <artifactId>wuwuwu</artifactId>
-    <version>0.0.1-RELEASE</version>
+    <version>0.0.2-SNAPSHOOT</version>
 
     <name>wuwuwu</name>
     <description>redis client</description>
@@ -38,9 +38,18 @@
         <maven.compiler.target>8</maven.compiler.target>
         <log4j-version>2.17.2</log4j-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hutool.version>5.5.7</hutool.version>
     </properties>
 
     <dependencies>
+
+
+        <!--  引入hutool工具      -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
 
         <!-- 引入lombok -->
         <dependency>
@@ -61,6 +70,7 @@
             <version>${log4j-version}</version>
         </dependency>
 
+        <!--        单测依赖-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -2,6 +2,7 @@ package com.wuwu.base.client;
 
 
 import com.wuwu.base.client.Handler.ArrayHandler;
+import com.wuwu.base.client.cofig.WuwuConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

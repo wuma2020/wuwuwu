@@ -1,9 +1,10 @@
-package com.wuwu.base.client;
+package com.wuwu.base.client.cofig;
 
+import com.wuwu.base.client.WuwuPipeline;
 import lombok.Data;
 
 /**
- * 配置相关
+ * redis配置和应用程序相关配置
  */
 @Data
 public class WuwuConfig {

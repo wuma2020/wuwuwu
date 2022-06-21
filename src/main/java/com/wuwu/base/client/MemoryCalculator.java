@@ -1,5 +1,8 @@
 package com.wuwu.base.client;
 
+
+import org.apache.logging.log4j.Logger;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -25,7 +28,7 @@ public class MemoryCalculator {
      * @param oldBuffer 老的缓存
      * @return  新的缓存对象
      */
-    public static ByteBuffer calculator(ByteBuffer oldBuffer) {
+    public static ByteBuffer calculator_add(ByteBuffer oldBuffer) {
 
         int remaining = oldBuffer.remaining();
         if (remaining < 1024) {
@@ -63,7 +66,12 @@ public class MemoryCalculator {
             int limit = oldBuffer.limit();
             ByteBuffer newBuffer = null;
             if (limit * 2 <= MAX_BUFFER_SIZE) {
-                newBuffer = ByteBuffer.allocate(limit * 2);
+                if(limit * 2 < 1024){
+                    newBuffer = ByteBuffer.allocate(1024);
+                }else {
+                    newBuffer = ByteBuffer.allocate(limit * 2);
+                }
+
             } else {
                 newBuffer = ByteBuffer.allocate(MAX_BUFFER_SIZE);
             }
@@ -85,7 +93,7 @@ public class MemoryCalculator {
         buffer1.put("123".getBytes(StandardCharsets.UTF_8));
 //        ByteBuffer bufferuffer = ByteBuffer.wrap("123".getBytes(StandardCharsets.UTF_8));
 
-        ByteBuffer calculator = calculator(buffer1);
+        ByteBuffer calculator = calculator_add(buffer1);
         System.out.println(calculator);
 
 

@@ -61,7 +61,7 @@ public class ProtocolUtil {
 
         SocketChannel socketChannel = futureClient.getSocketChannel();
         ByteBuffer buffer = futureClient.getBuffer();
-        ByteBuffer newBuffer = MemoryCalculator.calculator(buffer);
+        ByteBuffer newBuffer = MemoryCalculator.calculator_add(buffer);
         futureClient.setBuffer(newBuffer);
         int read = socketChannel.read(newBuffer);
 
@@ -91,10 +91,7 @@ public class ProtocolUtil {
 
         byte type = buffer.get();
         Object res = decodeByType(type, buffer, null);
-        if (res == null) {
-            //说明没有完成一整个的解析
-            return;
-        } else {
+        if (res != null) {
             //在这里返程注册新的写的数据
             Selector selector = wuwuFutureClient.getSelector();
             SocketChannel client = wuwuFutureClient.getSocketChannel();

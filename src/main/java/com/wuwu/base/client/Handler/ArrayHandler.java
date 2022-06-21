@@ -14,7 +14,12 @@ public class ArrayHandler implements MessageHandler {
     public void handle(WuwuResponse response) {
         Object result = response.getResult();
         if (result instanceof List) {
-            List<String> change = ((List<?>) result).stream().map(one -> "【 " + one + " 】").collect(Collectors.toList());
+            List<String> change = ((List<?>) result).stream().map(one -> {
+                String value = String.valueOf(one)
+                        .replaceAll("\r", "")
+                        .replaceAll("\n", "");
+                return "【 " + value + " 】";
+            }).collect(Collectors.toList());
             response.setResult(change);
         }
     }
