@@ -6,7 +6,7 @@
 
     <groupId>io.github.wuma2020</groupId>
     <artifactId>wuwuwu</artifactId>
-    <version>0.0.2-SNAPSHOOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <name>wuwuwu</name>
     <description>redis client</description>

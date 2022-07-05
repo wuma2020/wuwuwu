@@ -102,7 +102,7 @@ public class WuwuApplication {
             if (time == 100) {
                 LocalDateTime now1 = LocalDateTime.now();
                 if (now.plusSeconds(CommonConfig.SELECTOR_CIRCULATION_SLEEP).isAfter(now1)) {
-                    //出现是类似死循环,记录日志
+                    //出现是类似空轮训,记录日志
                     LogUtil.log.warn("selector在3秒内出现100次空轮训");
                     TimeUnit.MICROSECONDS.sleep(CommonConfig.SELECT_TIME_SLEEP);
                     time = 0;
